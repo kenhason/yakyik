@@ -8,7 +8,7 @@ class Zones extends Component {
 		this.state = {
 			zone: {
 				name: '',
-				zipCode: ''
+				zipCodes: []
 			},
 			list: []
 		}
@@ -30,22 +30,6 @@ class Zones extends Component {
 				this.setState({
 					list: results
 				})
-				
-				// let zoneList = []
-				// results.map((result) => {
-				// 	let zone = {
-				// 		name: result.name,
-				// 		zipCode: result.zipCodes[result.zipCodes.length - 1]
-				// 	}
-				// 	zoneList.push(zone)
-				// })
-
-				// let updatedList = Object.assign([], this.state.list)
-				// zoneList.map((zone) => updatedList.push(zone))
-				// this.setState({
-				// 	list: updatedList
-				// })
-				// console.log(zoneList)
 			})
 	}
 
@@ -61,7 +45,15 @@ class Zones extends Component {
 	updateZipCode(event) {
 		console.log("updateZipCode: " + event.target.value)
 		let updatedZone = Object.assign({}, this.state.zone)
-		updatedZone['zipCode'] = event.target.value
+		updatedZone['zipCodes'] = []
+
+		let zips = event.target.value.split(',')
+		zips.map((zip) => {
+			if (zip.trim() !== '') updatedZone['zipCodes'].push(zip.trim())
+		})
+
+		console.log(updatedZone['zipCodes'])
+		
 		this.setState({
 			zone: updatedZone
 		})
@@ -75,6 +67,21 @@ class Zones extends Component {
 		this.setState({
 			list: updatedList
 		})
+
+		superagent
+			.post('/api/zone')
+			.send({
+				name: this.state.zone.name,
+				zipCodes: this.state.zone.zipCodes.join(',')
+			})
+			.set('Content-Type', 'application/json')
+			.end(function(err, res){
+				if (err || !res.ok) {
+					alert('Oh no! error');
+				} else {
+					console.log('yay got ' + res.body);
+				}
+			});
 	}
 
 	render() {

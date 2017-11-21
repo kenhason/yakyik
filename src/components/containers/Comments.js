@@ -9,8 +9,7 @@ class Comments extends Component {
         this.state = {
             comment: {
                 username: '',
-                body: '', 
-                timestamp: ''
+                body: ''
             },
             list: []
         }
@@ -39,6 +38,18 @@ class Comments extends Component {
         this.setState({
             list: updatedList
         })
+
+        superagent
+        .post('/api/comment')
+        .send(this.state.comment)
+        .set('Content-Type', 'application/json')
+        .end(function(err, res){
+            if (err || !res.ok) {
+                alert('Oh no! error');
+            } else {
+                console.log('yay got ' + res.body);
+            }
+        });
     }
 
     updateUsername(event) {
@@ -52,14 +63,6 @@ class Comments extends Component {
     updateBody(event) {
         let updatedComment = Object.assign({}, this.state.comment)
         updatedComment['body'] = event.target.value
-        this.setState({
-            comment: updatedComment
-        })
-    }
-
-    updateTimestamp(event) {
-        let updatedComment = Object.assign({}, this.state.comment)
-        updatedComment['timestamp'] = event.target.value
         this.setState({
             comment: updatedComment
         })
@@ -82,7 +85,6 @@ class Comments extends Component {
 
                     <input onChange={this.updateUsername.bind(this)} className="form-control" type="text" placeholder="Username" /><br/>
                     <input onChange={this.updateBody.bind(this)} className="form-control" type="text" placeholder="Comment" /><br/>
-                    <input onChange={this.updateTimestamp.bind(this)} className="form-control" type="text" placeholder="Timestamp" /><br/>
                     <button onClick={this.submitComment.bind(this)} className="btn btn-info">Submit Comment</button>
                 </div>
             </div>
