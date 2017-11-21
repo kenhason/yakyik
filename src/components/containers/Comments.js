@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import Comment from '../presentation/Comment'
 import styles from './styles'
+import { APIManager } from '../../../utils'
 import superagent from 'superagent'
 
 class Comments extends Component {
@@ -16,19 +17,16 @@ class Comments extends Component {
     }
 
     componentDidMount() {
-        superagent
-            .get('/api/comment')
-            .set('Accept', 'application/json')
-            .end((err, response) => {
-                if (err) {
-                    alert('ERROR: ' + err)
-                    return
-                }
-                let results = response.body.results
-                this.setState({
-                    list: results
-                })
-            })    
+
+        APIManager.get('/api/comment', null, (err, results) => {
+			if (err) {
+				alert('ERROR: ' + err)
+				return
+			}
+			this.setState({
+				list: results.results
+			})
+		})
     }
 
     submitComment() {

@@ -19328,9 +19328,7 @@ var _Zone = __webpack_require__(31);
 
 var _Zone2 = _interopRequireDefault(_Zone);
 
-var _superagent = __webpack_require__(14);
-
-var _superagent2 = _interopRequireDefault(_superagent);
+var _utils = __webpack_require__(42);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -19367,15 +19365,13 @@ var Zones = function (_Component) {
 		value: function componentDidMount() {
 			var _this2 = this;
 
-			_superagent2.default.get('/api/zone').set('Accept', 'application/json').end(function (err, response) {
+			_utils.APIManager.get('/api/zone', null, function (err, results) {
 				if (err) {
 					alert('ERROR: ' + err);
 					return;
 				}
-				console.log(JSON.stringify(response.body));
-				var results = response.body.results;
 				_this2.setState({
-					list: results
+					list: results.results
 				});
 			});
 		}
@@ -19418,7 +19414,7 @@ var Zones = function (_Component) {
 				list: updatedList
 			});
 
-			_superagent2.default.post('/api/zone').send({
+			superagent.post('/api/zone').send({
 				name: this.state.zone.name,
 				zipCodes: this.state.zone.zipCodes.join(',')
 			}).set('Content-Type', 'application/json').end(function (err, res) {
@@ -20725,6 +20721,8 @@ var _styles = __webpack_require__(40);
 
 var _styles2 = _interopRequireDefault(_styles);
 
+var _utils = __webpack_require__(42);
+
 var _superagent = __webpack_require__(14);
 
 var _superagent2 = _interopRequireDefault(_superagent);
@@ -20760,14 +20758,13 @@ var Comments = function (_Component) {
         value: function componentDidMount() {
             var _this2 = this;
 
-            _superagent2.default.get('/api/comment').set('Accept', 'application/json').end(function (err, response) {
+            _utils.APIManager.get('/api/comment', null, function (err, results) {
                 if (err) {
                     alert('ERROR: ' + err);
                     return;
                 }
-                var results = response.body.results;
                 _this2.setState({
-                    list: results
+                    list: results.results
                 });
             });
         }
@@ -20961,6 +20958,59 @@ exports.default = {
 		}
 	}
 };
+
+/***/ }),
+/* 41 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _superagent = __webpack_require__(14);
+
+var _superagent2 = _interopRequireDefault(_superagent);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+exports.default = {
+    get: function get(url, params, callback) {
+        _superagent2.default.get(url).query(params).set('Accept', 'application/json').end(function (err, response) {
+            if (err) {
+                callback(err, null);
+                return;
+            }
+
+            if (response.body.confirmation == 'fail') callback({ message: response.body.message }, null);else callback(null, response.body);
+        });
+    },
+    post: function post() {},
+    put: function put() {},
+    delete: function _delete() {}
+};
+
+/***/ }),
+/* 42 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.APIManager = undefined;
+
+var _APIManager = __webpack_require__(41);
+
+var _APIManager2 = _interopRequireDefault(_APIManager);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+exports.APIManager = _APIManager2.default;
 
 /***/ })
 /******/ ]);
