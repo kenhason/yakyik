@@ -19,8 +19,22 @@ export default {
 
         })  
     },
-    post: () => {
-    
+    post: (url, body, callback) => {
+        superagent
+        .post(url)
+        .send(body)
+        .set('Content-Type', 'application/json')
+        .end(function(err, response){
+            if (err) {
+                callback(err, null)
+                return
+            }
+            if (response.body.confirmation == 'fail')
+                callback({ message: response.body.message }, null)
+            else 
+                callback(null, response.body)
+        });
+
     },
     put: () => {
 

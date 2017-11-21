@@ -19378,7 +19378,7 @@ var Zones = function (_Component) {
 	}, {
 		key: 'updateName',
 		value: function updateName(event) {
-			console.log("updateName: " + event.target.value);
+			// console.log("updateName: " + event.target.value)
 			var updatedZone = Object.assign({}, this.state.zone);
 			updatedZone['name'] = event.target.value;
 			this.setState({
@@ -19388,16 +19388,18 @@ var Zones = function (_Component) {
 	}, {
 		key: 'updateZipCode',
 		value: function updateZipCode(event) {
-			console.log("updateZipCode: " + event.target.value);
+			// console.log("updateZipCode: " + event.target.value)
 			var updatedZone = Object.assign({}, this.state.zone);
-			updatedZone['zipCodes'] = [];
 
 			var zips = event.target.value.split(',');
+			var zipCodes = [];
 			zips.map(function (zip) {
-				if (zip.trim() !== '') updatedZone['zipCodes'].push(zip.trim());
+				var trimmedZip = zip.trim();
+				if (trimmedZip !== '') zipCodes.push(trimmedZip);
 			});
+			updatedZone['zipCodes'] = zipCodes;
 
-			console.log(updatedZone['zipCodes']);
+			// console.log(updatedZone['zipCodes'])
 
 			this.setState({
 				zone: updatedZone
@@ -19406,23 +19408,19 @@ var Zones = function (_Component) {
 	}, {
 		key: 'submitZone',
 		value: function submitZone(event) {
-			console.log("submitZone: " + JSON.stringify(this.state.zone));
+			var _this3 = this;
 
-			var updatedList = Object.assign([], this.state.list);
-			updatedList.push(this.state.zone);
-			this.setState({
-				list: updatedList
-			});
-
-			superagent.post('/api/zone').send({
-				name: this.state.zone.name,
-				zipCodes: this.state.zone.zipCodes.join(',')
-			}).set('Content-Type', 'application/json').end(function (err, res) {
-				if (err || !res.ok) {
-					alert('Oh no! error');
-				} else {
-					console.log('yay got ' + res.body);
+			_utils.APIManager.post('/api/zone', this.state.zone, function (err, response) {
+				if (err) {
+					alert("ERROR: " + err);
+					return;
 				}
+				console.log(response.confirmation);
+				var updatedList = Object.assign([], _this3.state.list);
+				updatedList.push(response.result);
+				_this3.setState({
+					list: updatedList
+				});
 			});
 		}
 	}, {
@@ -19508,7 +19506,6 @@ var Zone = function (_Component) {
 		key: 'render',
 		value: function render() {
 			var styles = _styles2.default.zone;
-			var zipCodes = this.props.zone.zipCodes.join(',');
 			return _react2.default.createElement(
 				'div',
 				{ style: styles.container },
@@ -19524,7 +19521,7 @@ var Zone = function (_Component) {
 				_react2.default.createElement(
 					'span',
 					{ className: 'detail' },
-					zipCodes
+					this.props.zone.zipCodes.join(',')
 				),
 				_react2.default.createElement('br', null),
 				_react2.default.createElement(
@@ -20723,10 +20720,6 @@ var _styles2 = _interopRequireDefault(_styles);
 
 var _utils = __webpack_require__(42);
 
-var _superagent = __webpack_require__(14);
-
-var _superagent2 = _interopRequireDefault(_superagent);
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -20771,19 +20764,22 @@ var Comments = function (_Component) {
     }, {
         key: 'submitComment',
         value: function submitComment() {
-            console.log("submitButton: " + JSON.stringify(this.state.comment));
-            var updatedList = Object.assign([], this.state.list);
-            updatedList.push(this.state.comment);
-            this.setState({
-                list: updatedList
-            });
+            var _this3 = this;
 
-            _superagent2.default.post('/api/comment').send(this.state.comment).set('Content-Type', 'application/json').end(function (err, res) {
-                if (err || !res.ok) {
-                    alert('Oh no! error');
-                } else {
-                    console.log('yay got ' + res.body);
+            console.log("submitButton: " + JSON.stringify(this.state.comment));
+
+            _utils.APIManager.post('/api/comment', this.state.comment, function (err, response) {
+                if (err) {
+                    alert("ERROR: " + err);
+                    return;
                 }
+
+                console.log(response.confirmation);
+                var updatedList = Object.assign([], _this3.state.list);
+                updatedList.push(response.result);
+                _this3.setState({
+                    list: updatedList
+                });
             });
         }
     }, {
@@ -20987,7 +20983,15 @@ exports.default = {
             if (response.body.confirmation == 'fail') callback({ message: response.body.message }, null);else callback(null, response.body);
         });
     },
-    post: function post() {},
+    post: function post(url, body, callback) {
+        _superagent2.default.post(url).send(body).set('Content-Type', 'application/json').end(function (err, response) {
+            if (err) {
+                callback(err, null);
+                return;
+            }
+            if (response.body.confirmation == 'fail') callback({ message: response.body.message }, null);else callback(null, response.body);
+        });
+    },
     put: function put() {},
     delete: function _delete() {}
 };

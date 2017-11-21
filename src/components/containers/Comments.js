@@ -2,7 +2,6 @@ import React, { Component } from 'react'
 import Comment from '../presentation/Comment'
 import styles from './styles'
 import { APIManager } from '../../../utils'
-import superagent from 'superagent'
 
 class Comments extends Component {
     constructor() {
@@ -31,23 +30,20 @@ class Comments extends Component {
 
     submitComment() {
         console.log("submitButton: " + JSON.stringify(this.state.comment))
-        let updatedList = Object.assign([], this.state.list);
-        updatedList.push(this.state.comment)
-        this.setState({
-            list: updatedList
-        })
 
-        superagent
-        .post('/api/comment')
-        .send(this.state.comment)
-        .set('Content-Type', 'application/json')
-        .end(function(err, res){
-            if (err || !res.ok) {
-                alert('Oh no! error');
-            } else {
-                console.log('yay got ' + res.body);
-            }
-        });
+        APIManager.post('/api/comment', this.state.comment, (err, response) => {
+			if (err) {
+				alert("ERROR: " + err);
+				return
+			}
+            
+            console.log(response.confirmation);
+			let updatedList = Object.assign([], this.state.list);
+            updatedList.push(response.result)
+            this.setState({
+                list: updatedList
+            })
+		})
     }
 
     updateUsername(event) {

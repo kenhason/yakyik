@@ -30,7 +30,7 @@ class Zones extends Component {
 	}
 
 	updateName(event) {
-		console.log("updateName: " + event.target.value)
+		// console.log("updateName: " + event.target.value)
 		let updatedZone = Object.assign({}, this.state.zone)
 		updatedZone['name'] = event.target.value
 		this.setState({
@@ -39,16 +39,18 @@ class Zones extends Component {
 	}
 
 	updateZipCode(event) {
-		console.log("updateZipCode: " + event.target.value)
+		// console.log("updateZipCode: " + event.target.value)
 		let updatedZone = Object.assign({}, this.state.zone)
-		updatedZone['zipCodes'] = []
 
 		let zips = event.target.value.split(',')
+		let zipCodes = []
 		zips.map((zip) => {
-			if (zip.trim() !== '') updatedZone['zipCodes'].push(zip.trim())
+			let trimmedZip = zip.trim()
+			if (trimmedZip !== '') zipCodes.push(trimmedZip)
 		})
+		updatedZone['zipCodes'] = zipCodes
 
-		console.log(updatedZone['zipCodes'])
+		// console.log(updatedZone['zipCodes'])
 		
 		this.setState({
 			zone: updatedZone
@@ -56,28 +58,18 @@ class Zones extends Component {
 	}
 
 	submitZone(event) {
-		console.log("submitZone: " + JSON.stringify(this.state.zone))
-
-		let updatedList = Object.assign([], this.state.list)
-		updatedList.push(this.state.zone)
-		this.setState({
-			list: updatedList
-		})
-
-		superagent
-			.post('/api/zone')
-			.send({
-				name: this.state.zone.name,
-				zipCodes: this.state.zone.zipCodes.join(',')
+		APIManager.post('/api/zone', this.state.zone, (err, response) => {
+			if (err) {
+				alert("ERROR: " + err);
+				return
+			}
+			console.log(response.confirmation);
+			let updatedList = Object.assign([], this.state.list)
+			updatedList.push(response.result)
+			this.setState({
+				list: updatedList
 			})
-			.set('Content-Type', 'application/json')
-			.end(function(err, res){
-				if (err || !res.ok) {
-					alert('Oh no! error');
-				} else {
-					console.log('yay got ' + res.body);
-				}
-			});
+		})
 	}
 
 	render() {
