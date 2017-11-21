@@ -19358,7 +19358,7 @@ var Zones = function (_Component) {
 		return _this;
 	}
 	/**
-  * called when render() finishes
+  * called after render() finishes
   */
 
 

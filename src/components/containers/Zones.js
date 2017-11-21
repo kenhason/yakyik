@@ -14,7 +14,7 @@ class Zones extends Component {
 		}
 	}
 	/**
-	 * called when render() finishes
+	 * called after render() finishes
 	 */
 	componentDidMount() {
 		superagent
