@@ -7,7 +7,8 @@ var bodyParser = require('body-parser');
 var mongoose = require('mongoose')
 
 // var dbUrl = 'mongodb://localhost/yak-yik'
-var dbUrl = 'mongodb://kenhason:12345@ds117136.mlab.com:17136/codenet'
+var dbUrl = 'mongodb://kenhason:12345@ds117136.mlab.com:17136/yakyik'
+
 mongoose.connect(dbUrl, function(err, res) {
 	if (err) {
 		console.log("DB CONNECTION FAILED: " + err)
