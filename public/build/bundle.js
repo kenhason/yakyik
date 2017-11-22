@@ -19345,6 +19345,7 @@ var Zones = function (_Component) {
 		var _this = _possibleConstructorReturn(this, (Zones.__proto__ || Object.getPrototypeOf(Zones)).call(this));
 
 		_this.state = {
+			selected: -1,
 			list: []
 		};
 		return _this;
@@ -19394,13 +19395,24 @@ var Zones = function (_Component) {
 			});
 		}
 	}, {
+		key: 'selectZone',
+		value: function selectZone(index) {
+			console.log("Zone " + index + " selected");
+			this.setState({
+				selected: index
+			});
+		}
+	}, {
 		key: 'render',
 		value: function render() {
+			var _this4 = this;
+
 			var listItems = this.state.list.map(function (zone, i) {
+				var selected = i == _this4.state.selected;
 				return _react2.default.createElement(
 					'li',
 					{ key: i },
-					_react2.default.createElement(_presentation.Zone, { zone: zone })
+					_react2.default.createElement(_presentation.Zone, { index: i, onSelect: _this4.selectZone.bind(_this4), zone: zone, isSelected: selected })
 				);
 			});
 			return _react2.default.createElement(
@@ -19465,20 +19477,32 @@ var Zone = function (_Component) {
 	}
 
 	_createClass(Zone, [{
+		key: 'selectZone',
+		value: function selectZone(event) {
+			event.preventDefault();
+			this.props.onSelect(this.props.index);
+		}
+	}, {
 		key: 'render',
 		value: function render() {
 			var styles = _styles2.default.zone;
+			var title = this.props.isSelected ? _react2.default.createElement(
+				'a',
+				{ style: styles.title, href: '#' },
+				this.props.zone.name
+			) : _react2.default.createElement(
+				'a',
+				{ href: '#' },
+				this.props.zone.name
+			);
+
 			return _react2.default.createElement(
 				'div',
 				{ style: styles.container },
 				_react2.default.createElement(
 					'h2',
-					{ style: styles.header },
-					_react2.default.createElement(
-						'a',
-						{ style: styles.title, href: '#' },
-						this.props.zone.name
-					)
+					{ onClick: this.selectZone.bind(this), style: styles.header },
+					title
 				),
 				_react2.default.createElement(
 					'span',
@@ -20723,8 +20747,7 @@ var Comments = function (_Component) {
             var _this3 = this;
 
             console.log("submitButton: " + JSON.stringify(comment));
-            updatedComment = Object.assign({}, comment);
-            _utils.APIManager.post('/api/comment', updatedComment, function (err, response) {
+            _utils.APIManager.post('/api/comment', comment, function (err, response) {
                 if (err) {
                     alert("ERROR: " + err);
                     return;

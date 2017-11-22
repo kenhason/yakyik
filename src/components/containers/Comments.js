@@ -25,8 +25,7 @@ class Comments extends Component {
 
     submitComment(comment) {
         console.log("submitButton: " + JSON.stringify(comment))
-        updatedComment = Object.assign({}, comment)
-        APIManager.post('/api/comment', updatedComment, (err, response) => {
+        APIManager.post('/api/comment', comment, (err, response) => {
 			if (err) {
 				alert("ERROR: " + err);
 				return

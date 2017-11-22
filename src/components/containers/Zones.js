@@ -7,6 +7,7 @@ class Zones extends Component {
 	constructor() {
 		super()
 		this.state = {
+			selected: -1,
 			list: []
 		}
 	}
@@ -48,10 +49,18 @@ class Zones extends Component {
 		})
 	}
 
+	selectZone(index) {
+		console.log("Zone " + index + " selected")
+		this.setState({
+			selected: index
+		})
+	}
+
 	render() {
 		const listItems = this.state.list.map((zone, i) => {
+			let selected = (i == this.state.selected)
 			return (
-				<li key={i}><Zone zone={zone}/></li>
+				<li key={i}><Zone index={i} onSelect={this.selectZone.bind(this)} zone={zone} isSelected={selected}/></li>
 			)
 		})
 		return (
